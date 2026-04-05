@@ -23,7 +23,8 @@ src/
   env.py            Gymnasium trading environment
   inference.py      ONNX Runtime inference wrapper
   analysis.py       Gemini API integration for LLM trade analysis
-backtest.py         Main execution loop
+backtest.py         CLI backtest
+app.py              Streamlit dashboard
 convert.py          Model conversion script (run on Colab)
 requirements.txt    Python dependencies
 .env                API keys (gitignored)
@@ -62,13 +63,21 @@ python backtest.py AAPL
 
 Runs the ONNX agent on the last 252 trading days (1 year). Outputs a CSV log to `data/AAPL_backtest.csv` and prints the agent's return vs. a buy-and-hold benchmark.
 
-### 3. LLM Analysis (optional)
+### 3. Dashboard
+
+```bash
+streamlit run app.py
+```
+
+Interactive frontend with price charts, trade markers, net worth comparison, and on-demand Gemini analysis. Use the sidebar to pick a ticker, adjust the buy/sell threshold, and run backtests.
+
+### 4. LLM Analysis (CLI, optional)
 
 ```bash
 python -c "from src.analysis import analyze; print(analyze('data/AAPL_backtest.csv'))"
 ```
 
-Sends the backtest results to Gemini for analysis. The LLM identifies when the Sharpe-aware reward caused the agent to play defensively compared to a simple trend-follower.
+Sends the backtest results to Gemini for analysis. Also available via the dashboard button.
 
 ## Memory Optimizations
 
@@ -86,3 +95,5 @@ Sends the backtest results to Gemini for analysis. The LLM identifies when the S
 - onnxruntime: model inference
 - python-dotenv: environment variable management
 - google-genai: Gemini API for trade analysis
+- streamlit: interactive dashboard
+- plotly: charts
