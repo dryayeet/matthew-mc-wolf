@@ -2,7 +2,7 @@ stok/
 hi.py
 .env
 data/
-
 __pycache__/
 *.pyc
 .claude/
+models/scaler.npz
