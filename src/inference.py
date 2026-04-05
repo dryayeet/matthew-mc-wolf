@@ -1,11 +1,23 @@
 import numpy as np
 
-try:
-    from tflite_runtime.interpreter import Interpreter
-except ImportError:
-    from tensorflow.lite.python.lite import Interpreter
+def _get_interpreter_class():
+    try:
+        from tflite_runtime.interpreter import Interpreter
+        return Interpreter
+    except ImportError:
+        pass
+    try:
+        from tensorflow.lite.python.lite import Interpreter
+        return Interpreter
+    except ImportError:
+        pass
+    raise ImportError(
+        'Neither tflite-runtime nor tensorflow is installed. '
+        'Install one: pip install tflite-runtime  OR  pip install tensorflow'
+    )
 
 def load_model(path='models/agent.tflite'):
+    Interpreter = _get_interpreter_class()
     interp = Interpreter(model_path=path)
     interp.allocate_tensors()
     return interp
