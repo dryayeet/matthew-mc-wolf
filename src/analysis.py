@@ -5,11 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PROMPT_TPL = """Analyze the following trading log from a DRL agent using a DQN with LSTM encoder.
-The agent's reward function includes a Sharpe-ratio component: R_t = ln(NW_t/NW_{{t-1}}) + lambda * S_t.
+PROMPT_TPL = """Be concise and accurate. No filler, no speculation. Use bullet points. Be very specific and to the point. Answer in short. 
 
-Identify specific market conditions where the agent's Sharpe-ratio-aware reward led to
-defensive behavior compared to a standard trend-follower.
+Analyze this trading log from a DRL agent (DQN + LSTM encoder).
+Reward function: R_t = ln(NW_t/NW_{{t-1}}) + lambda * S_t (Sharpe-ratio-aware).
 
 Summary:
 - Total trades: {n_trades}
@@ -23,7 +22,10 @@ Summary:
 Last 50 trades:
 {trades}
 
-Provide actionable insights for improving the agent's reward function or training."""
+Answer these three questions only, backed by data from the log:
+1. Where did the Sharpe-aware reward cause defensive behavior vs a standard trend-follower?
+2. What specific market conditions triggered buys, sells, and prolonged holds?
+3. What are 2-3 concrete, actionable changes to improve the reward function or training?"""
 
 def _stats(rows):
     nw = np.array([float(r['net_worth']) for r in rows], dtype=np.float32)

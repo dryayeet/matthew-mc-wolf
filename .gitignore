@@ -2,7 +2,7 @@ stok/
 hi.py
 .env
 data/
-models/
+
 __pycache__/
 *.pyc
 .claude/

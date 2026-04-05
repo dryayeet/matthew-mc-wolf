@@ -5,7 +5,7 @@ from gymnasium import spaces
 class StockTradingEnv(gym.Env):
     metadata = {'render_modes': []}
 
-    def __init__(self, d, dr, w=30, m=50, lam=0.1, fee=0.001, b0=10000.0):
+    def __init__(self, d, dr, w=100, m=50, lam=0.1, fee=0.001, b0=10000.0):
         super().__init__()
         self.d = d          # scaled OHLCV (T,5) float32
         self.dr = dr        # raw OHLCV (T,5) float32

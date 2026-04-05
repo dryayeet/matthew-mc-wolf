@@ -4,7 +4,7 @@ from src.data_utils import load, load_scaler_np, apply_scaler_np
 from src.inference import load_model, get_action
 from src.env import StockTradingEnv
 
-def run(ticker='AAPL', model_path='models/agent.tflite',
+def run(ticker='AAPL', model_path='models/trading_model.onnx',
         scaler_path='models/scaler.npz', oos_days=252):
     raw = load(f'data/{ticker}.csv')
     mn, sc = load_scaler_np(scaler_path)
@@ -16,14 +16,16 @@ def run(ticker='AAPL', model_path='models/agent.tflite',
     scl_oos = scaled[split:]
 
     env = StockTradingEnv(d=scl_oos, dr=raw_oos)
-    interp = load_model(model_path)
+    sess = load_model(model_path)
 
     obs, _ = env.reset()
     log = []
     done = False
 
     while not done:
-        a = get_action(interp, obs)
+        # extract scaled close prices for the current window
+        prices = scl_oos[env.t - env.w:env.t, 3]  # (w,) scaled close
+        a = get_action(sess, prices)
         obs, r, done, trunc, info = env.step(a)
         log.append({
             'timestamp': env.t,
@@ -41,7 +43,7 @@ def run(ticker='AAPL', model_path='models/agent.tflite',
         w.writerows(log)
 
     # buy & hold benchmark
-    p0 = raw_oos[env.w, 3]  # first close after window
+    p0 = raw_oos[env.w, 3]
     pf = raw_oos[-1, 3]
     bh_ret = (pf - p0) / p0
     ag_ret = (log[-1]['net_worth'] - env.b0) / env.b0
