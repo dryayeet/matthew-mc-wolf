@@ -62,7 +62,7 @@ def analyze(log_path):
     resp = requests.post(
         'https://openrouter.ai/api/v1/chat/completions',
         headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
-        json={'model': 'google/gemini-2.0-flash-001',
+        json={'model': 'google/gemini-2.5-flash-lite',
               'messages': [{'role': 'user', 'content': prompt}]}
     )
     resp.raise_for_status()
