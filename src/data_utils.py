@@ -9,6 +9,8 @@ def fetch(tks, period='10y', out='data'):
     paths = []
     for tk in tks:
         df = yf.download(tk, period=period, auto_adjust=True)
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
         df = df[['Open','High','Low','Close','Volume']]
         df.ffill(inplace=True)
         df.dropna(inplace=True)
@@ -20,7 +22,11 @@ def fetch(tks, period='10y', out='data'):
     return paths
 
 def load(path, dtype=np.float32):
-    df = pd.read_csv(path, index_col='Date', parse_dates=True)
+    df = pd.read_csv(path, skiprows=[1, 2], index_col=0, parse_dates=True)
+    cols = ['Open','High','Low','Close','Volume']
+    # handle both flat and multi-header CSVs
+    if not all(c in df.columns for c in cols):
+        df = pd.read_csv(path, index_col=0, parse_dates=True)
     return df[['Open','High','Low','Close','Volume']].values.astype(dtype)
 
 def fit_scaler(arr):
