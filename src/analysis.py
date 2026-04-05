@@ -1,12 +1,12 @@
-import os, csv, json
+import os, csv
 import numpy as np
-import requests
+from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
 
 PROMPT_TPL = """Analyze the following trading log from a DRL agent using a DQN with LSTM encoder.
-The agent's reward function includes a Sharpe-ratio component: R_t = ln(NW_t/NW_{t-1}) + lambda * S_t.
+The agent's reward function includes a Sharpe-ratio component: R_t = ln(NW_t/NW_{{t-1}}) + lambda * S_t.
 
 Identify specific market conditions where the agent's Sharpe-ratio-aware reward led to
 defensive behavior compared to a standard trend-follower.
@@ -44,9 +44,11 @@ def _stats(rows):
                 mdd=mdd, mdd_pct=mdd*100, sharpe=sharpe)
 
 def analyze(log_path):
-    key = os.getenv('OPENROUTER_API_KEY')
+    key = os.getenv('GEMINI_API_KEY')
     if not key or key == 'your_key_here':
-        raise ValueError('Set OPENROUTER_API_KEY in .env')
+        raise ValueError('Set GEMINI_API_KEY in .env')
+
+    client = genai.Client(api_key=key)
 
     with open(log_path, 'r') as f:
         rows = list(csv.DictReader(f))
@@ -59,14 +61,11 @@ def analyze(log_path):
     )
     prompt = PROMPT_TPL.format(**st, trades=trades_str)
 
-    resp = requests.post(
-        'https://openrouter.ai/api/v1/chat/completions',
-        headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
-        json={'model': 'google/gemini-2.5-flash-lite',
-              'messages': [{'role': 'user', 'content': prompt}]}
+    resp = client.models.generate_content(
+        model='gemini-2.5-flash-lite',
+        contents=prompt
     )
-    resp.raise_for_status()
-    return resp.json()['choices'][0]['message']['content']
+    return resp.text
 
 if __name__ == '__main__':
     import sys

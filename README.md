@@ -21,7 +21,7 @@ src/
   data_utils.py     Data fetching (yfinance), loading, and MinMax scaling
   env.py            Gymnasium trading environment
   inference.py      TFLite runtime wrapper
-  analysis.py       OpenRouter API integration for LLM trade analysis
+  analysis.py       Gemini API integration for LLM trade analysis
 backtest.py         Run the trained agent on out-of-sample data
 convert.py          Convert SavedModel to quantized TFLite (run on Colab)
 requirements.txt    Python dependencies
@@ -36,10 +36,10 @@ source stok/bin/activate   # on Windows: stok\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Add your OpenRouter API key to `.env`:
+Add your Gemini API key to `.env`:
 
 ```
-OPENROUTER_API_KEY=your_key_here
+GEMINI_API_KEY=your_key_here
 ```
 
 ## Usage
